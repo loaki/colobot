@@ -6,6 +6,18 @@ class Base(DeclarativeBase):
     pass
 
 
+class Reminder(Base):
+    __tablename__ = "reminder"
+    _id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    _guildId = sqlalchemy.Column(sqlalchemy.Integer)
+    name = sqlalchemy.Column(sqlalchemy.String)
+    message = sqlalchemy.Column(sqlalchemy.String)
+    prompt = sqlalchemy.Column(sqlalchemy.String)
+    repeat = sqlalchemy.Column(sqlalchemy.String)
+    startDate = sqlalchemy.Column(sqlalchemy.DateTime)
+    nextDate = sqlalchemy.Column(sqlalchemy.DateTime)
+
+
 class Config(Base):
     __tablename__ = "config"
     _id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)

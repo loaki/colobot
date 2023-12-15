@@ -3,3 +3,4 @@ python-dotenv
 nextcord-ext-help-commands
 nextcord-ext-menus
 sqlalchemy
+python-dateutil

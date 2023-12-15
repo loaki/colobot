@@ -10,7 +10,7 @@ class Config(commands.Cog, name="Config"):
         self.bot = bot
 
     @nextcord.slash_command(name="config", guild_ids=[848117137397907466])
-    async def config_slash(
+    async def config(
         self,
         interaction: nextcord.Interaction,
         option: str = nextcord.SlashOption(
@@ -26,36 +26,40 @@ class Config(commands.Cog, name="Config"):
         ```
         """
         # check permissions
-        print(check_adminrole(interaction.guild, interaction.user))
-        if any(
+        if not any(
             [
                 interaction.user.top_role.permissions.administrator,
                 check_adminrole(interaction.guild, interaction.user),
             ]
         ):
-            set_opt = None
-            if role and "Role" in option:
-                set_opt = role
-            if channel and "Chan" in option:
-                set_opt = channel
-            if set_opt:
-                db = get_local_db()
-                config = (
-                    db.session.query(ConfigDb)
-                    .filter(ConfigDb._guildId == interaction.guild.id)
-                    .first()
-                )
-                if config is None:
-                    config = ConfigDb()
-                    config._guildId = interaction.guild.id
-                    db.session.add(config)
-                if hasattr(config, option):
-                    setattr(config, option, set_opt.id)
-                    await interaction.response.send_message(
-                        embed=embed_success(title="", description=f"✅ {option} set to {set_opt}")
-                    )
+            await interaction.response.send_message(
+            embed=embed_error(title="", description="❌ Non, pas envie")
+        )
+        set_opt = None
+        if role and "Role" in option:
+            set_opt = role
+        if channel and "Chan" in option:
+            set_opt = channel
+        if set_opt:
+            db = get_local_db()
+            config = (
+                db.session.query(ConfigDb)
+                .filter(ConfigDb._guildId == interaction.guild.id)
+                .first()
+            )
+            if config is None:
+                config = ConfigDb()
+                config._guildId = interaction.guild.id
+                db.session.add(config)
+            if hasattr(config, option):
+                setattr(config, option, set_opt.id)
                 db.session.commit()
+                await interaction.response.send_message(
+                    embed=embed_success(title="", description=f"✅ {option} set to {set_opt}")
+                )
                 return
+            db.session.commit()
+            return
         await interaction.response.send_message(
             embed=embed_error(title="", description="❌ Invalid arguments")
         )

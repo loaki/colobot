@@ -28,7 +28,7 @@ def main():
     )
 
     bot = commands.Bot(
-        commands.when_mentioned_or(config.BOT_PREFIX), intents=intents, activity=activity
+        commands.when_mentioned_or(config.BOT_PREFIX), intents=intents, activity=activity, help_command=help_commands.PaginatedHelpCommand()
     )
 
     # Init database
