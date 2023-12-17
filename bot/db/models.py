@@ -10,12 +10,14 @@ class Reminder(Base):
     __tablename__ = "reminder"
     _id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     _guildId = sqlalchemy.Column(sqlalchemy.Integer)
+    _author = sqlalchemy.Column(sqlalchemy.Integer)
     name = sqlalchemy.Column(sqlalchemy.String)
     message = sqlalchemy.Column(sqlalchemy.String)
     prompt = sqlalchemy.Column(sqlalchemy.String)
     repeat = sqlalchemy.Column(sqlalchemy.String)
     startDate = sqlalchemy.Column(sqlalchemy.DateTime)
     nextDate = sqlalchemy.Column(sqlalchemy.DateTime)
+    notify = sqlalchemy.Column(sqlalchemy.Boolean)
 
 
 class Config(Base):

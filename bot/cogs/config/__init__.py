@@ -1,7 +1,8 @@
 import nextcord
 from db.models import Config as ConfigDb, get_local_db
-from utils import embed_success, embed_error
+from utils import embed_success, embed_error, build_embed
 from nextcord.ext import commands
+from nextcord.utils import get
 from utils.check import check_adminrole
 
 
@@ -10,7 +11,39 @@ class Config(commands.Cog, name="Config"):
         self.bot = bot
 
     @nextcord.slash_command(name="config", guild_ids=[848117137397907466])
-    async def config(
+    async def config(self, interaction: nextcord.Interaction):
+        """A command which show config.
+        Usage:
+        ```
+        /config
+        ```
+        """
+        db = get_local_db()
+        config = (
+            db.session.query(ConfigDb).filter(ConfigDb._guildId == interaction.guild.id).first()
+        )
+        if config is None:
+            await interaction.response.send_message(
+                embed=embed_error(title="", description="❌ Config not found")
+            )
+            return
+        embed = build_embed(
+            title="⚙️ Config", footer=f"{interaction.guild.name}", colour=nextcord.Colour.blurple()
+        )
+        for i in ConfigDb.__dict__.keys():
+            if i[0] != "_" and hasattr(config, i):
+                value = None
+                if "Chan" in i and getattr(config, i):
+                    value = get(interaction.guild.channels, id=getattr(config, i))
+                if "Role" in i and getattr(config, i):
+                    value = get(interaction.guild.roles, id=getattr(config, i))
+                if value:
+                    value = value.mention
+                embed.add_field(name=i, value=value or "-")
+        await interaction.response.send_message(embed=embed)
+
+    @nextcord.slash_command(name="set_config", guild_ids=[848117137397907466])
+    async def set_config(
         self,
         interaction: nextcord.Interaction,
         option: str = nextcord.SlashOption(
@@ -22,7 +55,7 @@ class Config(commands.Cog, name="Config"):
         """A command which setup config.
         Usage:
         ```
-        /config option role/channel
+        /set_config option role/channel
         ```
         """
         # check permissions
@@ -33,8 +66,8 @@ class Config(commands.Cog, name="Config"):
             ]
         ):
             await interaction.response.send_message(
-            embed=embed_error(title="", description="❌ Non, pas envie")
-        )
+                embed=embed_error(title="", description="❌ Non, pas envie")
+            )
         set_opt = None
         if role and "Role" in option:
             set_opt = role
@@ -43,9 +76,7 @@ class Config(commands.Cog, name="Config"):
         if set_opt:
             db = get_local_db()
             config = (
-                db.session.query(ConfigDb)
-                .filter(ConfigDb._guildId == interaction.guild.id)
-                .first()
+                db.session.query(ConfigDb).filter(ConfigDb._guildId == interaction.guild.id).first()
             )
             if config is None:
                 config = ConfigDb()

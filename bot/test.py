@@ -9,7 +9,7 @@ from datetime import datetime
 #         print(d.strftime("%d %a %m"))
 # print(datetime.weekday())
 # now = datetime.now()
-# offset = 
+# offset =
 # startDate = now + relativedelta
 hour = 12
 d = 10
