@@ -151,7 +151,7 @@ class Reminder(commands.Cog, name="Reminder"):
             )
             return
         if start_week_day:
-            offset = 7 - startDate.weekday()
+            offset = abs(start_week_day - startDate.weekday())
             startDate += relativedelta.relativedelta(days=offset)
         nextDate = startDate
         db = get_local_db()
