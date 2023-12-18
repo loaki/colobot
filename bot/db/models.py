@@ -19,6 +19,7 @@ class Reminder(Base):
     nextDate = sqlalchemy.Column(sqlalchemy.DateTime)
     notifyMember = sqlalchemy.Column(sqlalchemy.Integer)
     notifyRole = sqlalchemy.Column(sqlalchemy.Integer)
+    channel = sqlalchemy.Column(sqlalchemy.Integer)
 
 
 class Config(Base):
