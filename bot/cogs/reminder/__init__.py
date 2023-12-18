@@ -151,9 +151,11 @@ class Reminder(commands.Cog, name="Reminder"):
             )
             return
         if start_week_day:
-            offset = abs(start_week_day - startDate.weekday())
+            if startDate.weekday() <= start_week_day:
+                offset = start_week_day - startDate.weekday()
+            else :
+                offset = 7 - (startDate.weekday() - start_week_day)
             startDate += relativedelta.relativedelta(days=offset)
-        nextDate = startDate
         db = get_local_db()
         reminder = ReminderDb()
         reminder._guildId = interaction.guild.id
@@ -163,7 +165,7 @@ class Reminder(commands.Cog, name="Reminder"):
         reminder.prompt = prompt
         reminder.repeat = repeat
         reminder.startDate = startDate
-        reminder.nextDate = nextDate
+        reminder.nextDate = startDate
         if notify_member:
             notify_member = notify_member.id
         reminder.notifyMember = notify_member
