@@ -1,11 +1,11 @@
 import os
 
-import config
+from . import config
 import nextcord
 from nextcord.ext import commands
 from nextcord.ext import help_commands
-from utils.embedder import embed_error
-from db.models import get_local_db, Config
+from .utils.embedder import embed_error
+from .db.models import get_local_db, Config
 
 
 def main():
@@ -38,8 +38,9 @@ def main():
     get_local_db().create_all()
 
     # Get the modules of all cogs whose directory structure is ./cogs/<module_name>
-    for folder in os.listdir("cogs"):
-        bot.load_extension(f"cogs.{folder}")
+    for folder in os.listdir("bot/cogs"):
+        if not folder.startswith("__"):
+            bot.load_extension(f".{folder}", package=f"bot.cogs")
 
     @bot.listen()
     async def on_ready():

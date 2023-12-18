@@ -1,5 +1,6 @@
 import nextcord
-from db.models import get_local_db, Config
+
+from ..db.models import get_local_db, Config
 
 
 def check_adminrole(guild: nextcord.Guild, member: nextcord.Member):

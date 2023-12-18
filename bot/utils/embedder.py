@@ -1,6 +1,7 @@
+import nextcord
+
 from typing import Optional
 
-import nextcord
 
 DEFAULT_COLOR = nextcord.Colour.blurple()
 MAX_EMBED_DESCRIPTION_LENGTH = 4096

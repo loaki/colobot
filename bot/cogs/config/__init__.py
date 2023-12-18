@@ -1,9 +1,11 @@
 import nextcord
-from db.models import Config as ConfigDb, get_local_db
-from utils import embed_success, embed_error, build_embed
-from nextcord.ext import commands
+
 from nextcord.utils import get
-from utils.check import check_adminrole
+from nextcord.ext import commands
+
+from ...utils.check import check_adminrole
+from ...db.models import Config as ConfigDb, get_local_db
+from ...utils import embed_success, embed_error, build_embed
 
 
 class Config(commands.Cog, name="Config"):

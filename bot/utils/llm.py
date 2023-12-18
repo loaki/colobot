@@ -1,6 +1,7 @@
 import json
-import config
 import requests
+
+from .. import config
 
 
 def llm_call(prompt: str):

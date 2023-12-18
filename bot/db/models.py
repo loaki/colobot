@@ -36,7 +36,7 @@ class LocalDatabase:
     def __init__(self):
         self.db_name = "discord.db"
         self._engine = sqlalchemy.create_engine(
-            f"sqlite:///db/{self.db_name}?check_same_thread=false", echo=True, future=True
+            f"sqlite:///bot/db/{self.db_name}?check_same_thread=false", echo=True, future=True
         )
         self._session = sqlalchemy.orm.sessionmaker(bind=self._engine)()
 
