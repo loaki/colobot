@@ -9,7 +9,7 @@ class Ping(commands.Cog, name="Ping"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @nextcord.slash_command(name="ping", guild_ids=[848117137397907466])
+    @nextcord.slash_command(name="ping")
     async def ping(self, interaction: nextcord.Interaction):
         """A command which simply acknowledges the user's ping.
         Usage:

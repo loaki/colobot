@@ -12,7 +12,7 @@ class Config(commands.Cog, name="Config"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @nextcord.slash_command(name="config", guild_ids=[848117137397907466])
+    @nextcord.slash_command(name="config")
     async def config(self, interaction: nextcord.Interaction):
         """A command which show config.
         Usage:
@@ -43,7 +43,7 @@ class Config(commands.Cog, name="Config"):
                 embed.add_field(name=i, value=value or "-")
         await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name="set_config", guild_ids=[848117137397907466])
+    @nextcord.slash_command(name="set_config")
     async def set_config(
         self,
         interaction: nextcord.Interaction,
