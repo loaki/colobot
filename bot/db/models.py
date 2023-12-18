@@ -28,6 +28,8 @@ class Config(Base):
     _guildId = sqlalchemy.Column(sqlalchemy.Integer)
     adminRole = sqlalchemy.Column(sqlalchemy.Integer)
     notifChan = sqlalchemy.Column(sqlalchemy.Integer)
+    dailyChan = sqlalchemy.Column(sqlalchemy.Integer)
+    dailyMessage = sqlalchemy.Column(sqlalchemy.Integer)
 
 
 class LocalDatabase:

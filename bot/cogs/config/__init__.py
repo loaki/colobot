@@ -30,7 +30,7 @@ class Config(commands.Cog, name="Config"):
         embed = build_embed(title="⚙️ Config", colour=nextcord.Colour.blurple())
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
         for i in ConfigDb.__dict__.keys():
-            if i[0] != "_" and hasattr(config, i):
+            if i[0] != "_" and ("Role" in i or "Chan" in i) and hasattr(config, i):
                 value = None
                 if "Chan" in i and getattr(config, i):
                     value = get(interaction.guild.channels, id=getattr(config, i))
@@ -46,7 +46,9 @@ class Config(commands.Cog, name="Config"):
         self,
         interaction: nextcord.Interaction,
         option: str = nextcord.SlashOption(
-            choices=[i for i in ConfigDb.__dict__.keys() if i[0] != "_"]
+            choices=[
+                i for i in ConfigDb.__dict__.keys() if i[0] != "_" and ("Role" in i or "Chan" in i)
+            ]
         ),
         role: nextcord.Role = None,
         channel: nextcord.TextChannel = None,

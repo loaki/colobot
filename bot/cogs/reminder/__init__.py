@@ -36,7 +36,9 @@ class Reminder(commands.Cog, name="Reminder"):
                         continue
                     if reminder.prompt:
                         loop = asyncio.get_running_loop()
-                        generated_response = await loop.run_in_executor(None, llm_call, reminder.prompt)
+                        generated_response = await loop.run_in_executor(
+                            None, llm_call, reminder.prompt
+                        )
                     embed = build_embed(
                         title=f"⏰ {reminder.name}",
                         description=generated_response or reminder.message,
@@ -67,7 +69,7 @@ class Reminder(commands.Cog, name="Reminder"):
     async def before_reminder(self):
         await self.bot.wait_until_ready()
 
-    @nextcord.slash_command(name="reminder", guild_ids=[848117137397907466])
+    @nextcord.slash_command(name="reminder")
     async def reminder(self, interaction: nextcord.Interaction):
         """A command which show reminders.
         Usage:
@@ -79,15 +81,17 @@ class Reminder(commands.Cog, name="Reminder"):
         reminders = (
             db.session.query(ReminderDb).filter(ReminderDb._guildId == interaction.guild.id).all()
         )
-        embed = build_embed(title="⏰ Reminder", colour=nextcord.Colour.blurple())
+        embed = build_embed(title="⏰ Reminder", colour=nextcord.Colour.purple())
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
         for reminder in reminders:
             embed.add_field(
-                name=reminder.name, value=f"{str(reminder.nextDate)} - {reminder.repeat}"
+                name=reminder.name,
+                value=f"{str(reminder.nextDate)} - {reminder.repeat}",
+                inline=False,
             )
         await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name="add_reminder", guild_ids=[848117137397907466])
+    @nextcord.slash_command(name="add_reminder")
     async def add_reminder(
         self,
         interaction: nextcord.Interaction,
@@ -115,7 +119,7 @@ class Reminder(commands.Cog, name="Reminder"):
         prompt: Optional[str] = None,
         notify_member: nextcord.Member = None,
         notify_role: nextcord.Role = None,
-        channel: nextcord.TextChannel = None
+        channel: nextcord.TextChannel = None,
     ):
         """A command which save reminder.
         Usage:
@@ -183,7 +187,7 @@ class Reminder(commands.Cog, name="Reminder"):
         )
         return
 
-    @nextcord.slash_command(name="rm_reminder", guild_ids=[848117137397907466])
+    @nextcord.slash_command(name="rm_reminder")
     async def rm_reminder(
         self,
         interaction: nextcord.Interaction,

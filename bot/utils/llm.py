@@ -13,7 +13,7 @@ def llm_call(prompt: str):
         "n_predict": 512,
         "temperature": 0.7,
         "stop": ["<|im_end|>"],
-        "tokens_cached": 0
+        "tokens_cached": 0,
     }
     response = requests.post(hostname, json=body)
     if response.status_code == requests.codes.ok:
