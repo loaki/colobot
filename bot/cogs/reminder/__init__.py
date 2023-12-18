@@ -181,6 +181,8 @@ class Reminder(commands.Cog, name="Reminder"):
         if notify_role:
             notify_role = notify_role.id
         reminder.notifyRole = notify_role
+        if channel:
+            channel = channel.id
         reminder.channel = channel
         db.session.add(reminder)
         db.session.commit()
