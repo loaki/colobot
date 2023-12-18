@@ -154,17 +154,6 @@ class Reminder(commands.Cog, name="Reminder"):
             offset = 7 - startDate.weekday()
             startDate += relativedelta.relativedelta(days=offset)
         nextDate = startDate
-        if repeat:
-            if repeat == "Day":
-                nextDate += relativedelta.relativedelta(days=1)
-            if repeat == "Week":
-                nextDate += relativedelta.relativedelta(days=7)
-            if repeat == "2Week":
-                nextDate += relativedelta.relativedelta(days=14)
-            if repeat == "Month":
-                nextDate += relativedelta.relativedelta(months=1)
-            if repeat == "Year":
-                nextDate += relativedelta.relativedelta(years=1)
         db = get_local_db()
         reminder = ReminderDb()
         reminder._guildId = interaction.guild.id
