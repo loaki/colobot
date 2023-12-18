@@ -1,6 +1,8 @@
 import nextcord
+import asyncio
 from db.models import Reminder as ReminderDb, Config, get_local_db
 from utils import embed_success, embed_error, build_embed
+from utils.llm import llm_call
 from nextcord.ext import commands, tasks
 from nextcord.utils import get
 from utils.check import check_adminrole
@@ -31,12 +33,18 @@ class Reminder(commands.Cog, name="Reminder"):
                 db.session.query(ReminderDb).filter(ReminderDb._guildId == config._guildId).all()
             )
             for reminder in reminders:
-                if reminder.nextDate <= now:
+                # if reminder.nextDate <= now:
+                if 1==1:
                     embed = build_embed(
                         title=f"⏰ {reminder.name}",
                         description=reminder.message,
                         colour=nextcord.Colour.blue(),
                     )
+                    if reminder.prompt:
+                        loop = asyncio.get_running_loop()
+                        generated_response = await loop.run_in_executor(None, llm_call, reminder.prompt)
+                        if generated_response:
+                            embed.description = generated_response
                     notify = None
                     if reminder.notifyMember:
                         notify = get(guild.members, id=reminder.notifyMember)
