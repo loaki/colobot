@@ -17,7 +17,7 @@ class Reminder(commands.Cog, name="Reminder"):
     def cog_unload(self):
         self.send_reminder.cancel()
 
-    @tasks.loop(hours=1)
+    @tasks.loop(minutes=1)
     async def send_reminder(self):
         now = datetime.now()
         db = get_local_db()
@@ -32,13 +32,18 @@ class Reminder(commands.Cog, name="Reminder"):
             )
             for reminder in reminders:
                 if reminder.nextDate <= now:
-                    member = get(guild.members, id=reminder._author)
                     embed = build_embed(
                         title=f"⏰ {reminder.name}",
                         description=reminder.message,
-                        footer=f"{member.name}",
                         colour=nextcord.Colour.blue(),
                     )
+                    notify = None
+                    if reminder.notifyMember:
+                        notify = get(guild.members, id=reminder.notifyMember)
+                    if reminder.notifyRole:
+                        notify = get(guild.roles, id=reminder.notifyRole)
+                    if notify:
+                        await chan.send(notify.mention)
                     await chan.send(embed=embed)
                     if reminder.repeat:
                         if reminder.repeat == "Day":
@@ -69,9 +74,8 @@ class Reminder(commands.Cog, name="Reminder"):
         reminders = (
             db.session.query(ReminderDb).filter(ReminderDb._guildId == interaction.guild.id).all()
         )
-        embed = build_embed(
-            title="⏰ Reminder", footer=f"{interaction.guild.name}", colour=nextcord.Colour.blurple()
-        )
+        embed = build_embed(title="⏰ Reminder", colour=nextcord.Colour.blurple())
+        embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
         for reminder in reminders:
             embed.add_field(
                 name=reminder.name, value=f"{str(reminder.nextDate)} - {reminder.repeat}"
@@ -104,7 +108,8 @@ class Reminder(commands.Cog, name="Reminder"):
         ),
         message: Optional[str] = None,
         prompt: Optional[str] = None,
-        notify: Optional[bool] = False,
+        notify_member: nextcord.Member = None,
+        notify_role: nextcord.Role = None,
     ):
         """A command which save reminder.
         Usage:
@@ -158,7 +163,12 @@ class Reminder(commands.Cog, name="Reminder"):
         reminder.repeat = repeat
         reminder.startDate = startDate
         reminder.nextDate = nextDate
-        reminder.notify = notify
+        if notify_member:
+            notify_member = notify_member.id
+        reminder.notifyMember = notify_member
+        if notify_role:
+            notify_role = notify_role.id
+        reminder.notifyRole = notify_role
         db.session.add(reminder)
         db.session.commit()
         await interaction.response.send_message(

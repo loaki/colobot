@@ -17,7 +17,8 @@ class Reminder(Base):
     repeat = sqlalchemy.Column(sqlalchemy.String)
     startDate = sqlalchemy.Column(sqlalchemy.DateTime)
     nextDate = sqlalchemy.Column(sqlalchemy.DateTime)
-    notify = sqlalchemy.Column(sqlalchemy.Boolean)
+    notifyMember = sqlalchemy.Column(sqlalchemy.Integer)
+    notifyRole = sqlalchemy.Column(sqlalchemy.Integer)
 
 
 class Config(Base):

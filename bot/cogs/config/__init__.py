@@ -27,9 +27,8 @@ class Config(commands.Cog, name="Config"):
                 embed=embed_error(title="", description="❌ Config not found")
             )
             return
-        embed = build_embed(
-            title="⚙️ Config", footer=f"{interaction.guild.name}", colour=nextcord.Colour.blurple()
-        )
+        embed = build_embed(title="⚙️ Config", colour=nextcord.Colour.blurple())
+        embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
         for i in ConfigDb.__dict__.keys():
             if i[0] != "_" and hasattr(config, i):
                 value = None
