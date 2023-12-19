@@ -36,6 +36,7 @@ class Reminder(commands.Cog, name="Reminder"):
                     chan = get(guild.text_channels, id=reminder.channel or config.notifChan)
                     if not chan:
                         continue
+                    generated_response = None
                     if reminder.prompt:
                         loop = asyncio.get_running_loop()
                         generated_response = await loop.run_in_executor(

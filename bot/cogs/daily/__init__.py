@@ -50,7 +50,7 @@ class Daily(commands.Cog, name="Daily"):
         configs = db.session.query(Config).all()
         for config in configs:
             guild = self.bot.get_guild(config._guildId)
-            chan = get(guild.text_channels, id=config.notifChan)
+            chan = get(guild.text_channels, id=config.dailyChan)
             if not chan:
                 continue
             embed = build_embed(title=f"🗞️ Daily", colour=nextcord.Colour.orange())

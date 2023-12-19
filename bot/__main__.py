@@ -58,20 +58,6 @@ def main():
             db.session.add(config)
             db.session.commit()
 
-    @bot.event
-    async def on_command_error(ctx: commands.Context, error: commands.CommandError):
-        if isinstance(error, commands.CommandNotFound):
-            return
-        try:
-            await ctx.reply(
-                embed=embed_error(
-                    title=" ", description=f"❌ {error}\n``` ?help {ctx.command.name}```"
-                ),
-                mention_author=False,
-            )
-        except:
-            pass
-
     # Run Discord bot
     bot.run(config.DISCORD_TOKEN)
 
