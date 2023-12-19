@@ -6,8 +6,11 @@ from .. import config
 
 def llm_call(prompt: str):
     hostname = config.LLM_HOST
-    ping = requests.post(hostname, timeout=3)
-    if ping.status_code == 404:
+    try:
+        ping = requests.post(hostname, timeout=3)
+        if ping.status_code == 404:
+            return None
+    except:
         return None
     body = {
         "prompt": f"<|im_start|>system\nTu es un assistant virtuel sur un bot discord, tu es drole et gentil<|im_end|>\n<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant",

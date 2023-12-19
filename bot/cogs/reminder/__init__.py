@@ -45,7 +45,7 @@ class Reminder(commands.Cog, name="Reminder"):
                     embed = build_embed(
                         title=f"⏰ {reminder.name}",
                         description=generated_response or reminder.message,
-                        colour=nextcord.Colour.blue(),
+                        colour=nextcord.Colour.purple(),
                     )
                     notify = None
                     if reminder.notifyMember:
