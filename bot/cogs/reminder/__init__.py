@@ -32,7 +32,7 @@ class Reminder(commands.Cog, name="Reminder"):
                 db.session.query(ReminderDb).filter(ReminderDb._guildId == config._guildId).all()
             )
             for reminder in reminders:
-                if reminder.nextDate <= now:
+                if reminder.nextDate and reminder.nextDate <= now:
                     chan = get(guild.text_channels, id=reminder.channel or config.notifChan)
                     if not chan:
                         continue
@@ -66,7 +66,9 @@ class Reminder(commands.Cog, name="Reminder"):
                             reminder.nextDate += relativedelta.relativedelta(months=1)
                         if reminder.repeat == "Year":
                             reminder.nextDate += relativedelta.relativedelta(years=1)
-                        db.session.commit()
+                    else:
+                        reminder.nextDate = None
+                    db.session.commit()
 
     @send_reminder.before_loop
     async def before_reminder(self):
