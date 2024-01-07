@@ -2,7 +2,7 @@ import asyncio
 import nextcord
 
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, time
 from nextcord.utils import get
 from dateutil import relativedelta
 from nextcord.ext import commands, tasks
