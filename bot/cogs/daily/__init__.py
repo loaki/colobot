@@ -57,7 +57,7 @@ class Daily(commands.Cog, name="Daily"):
             embed.set_author(name=guild.name, icon_url=guild.icon)
             today = date.today()
             embed.add_field(
-                name="Date", value=f"{str(today)} - Week {today.isocalendar()[1] % 5 + 1}", inline=False
+                name="Date", value=f"{str(today)} - Week {(today.isocalendar()[1] - 1) % 5 + 1}", inline=False
             )
             today_color, tomorrow_color = self.get_tempo_colors()
             embed.add_field(
