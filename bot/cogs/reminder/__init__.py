@@ -21,7 +21,7 @@ class Reminder(commands.Cog, name="Reminder"):
     def cog_unload(self):
         self.send_reminder.cancel()
 
-    @tasks.loop(time=[time(minute=0)])
+    @tasks.loop(time=[time(hour=h, minute=0) for h in range(24)])
     async def send_reminder(self):
         now = datetime.now()
         db = get_local_db()
