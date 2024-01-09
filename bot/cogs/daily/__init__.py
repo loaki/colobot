@@ -27,7 +27,7 @@ class Daily(commands.Cog, name="Daily"):
         chan = get(guild.text_channels, id=config.notifChan)
         if not chan:
             return
-        prompt = "ecris un court message drole pour annoncer a la colocation que demain est un jour rouge et qu'il faudra utiliser moins d'electricite"
+        prompt = "ecris un court message drole pour annoncer a la colocation que demain est un jour rouge et qu'il faudra economiser l'electricite"
         loop = asyncio.get_running_loop()
         generated_response = await loop.run_in_executor(None, llm_call, prompt)
         embed = build_embed(
