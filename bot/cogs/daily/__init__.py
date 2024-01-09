@@ -1,6 +1,7 @@
 import json
 import requests
 import nextcord
+import asyncio
 
 from nextcord.utils import get
 from dateutil import relativedelta
@@ -9,6 +10,7 @@ from datetime import datetime, time, date
 
 from ... import config
 from ...utils import build_embed
+from ...utils.llm import llm_call
 from ...db.models import Config, get_local_db
 
 
@@ -19,6 +21,21 @@ class Daily(commands.Cog, name="Daily"):
 
     def cog_unload(self):
         self.daily.cancel()
+
+    async def send_tempo_notif(self, config):
+        guild = self.bot.get_guild(config._guildId)
+        chan = get(guild.text_channels, id=config.notifChan)
+        if not chan:
+            return
+        prompt = "ecris un court message drole pour annoncer a la colocation que demain est un jour rouge et qu'il faudra utiliser moins d'electricite"
+        loop = asyncio.get_running_loop()
+        generated_response = await loop.run_in_executor(None, llm_call, prompt)
+        embed = build_embed(
+            title=f"🔴 Tempo",
+            description=generated_response,
+            colour=nextcord.Colour.purple(),
+        )
+        await chan.send(embed=embed)
 
     def get_tempo_colors(self):
         colors = {"RED": "🔴", "BLUE": "🔵", "WHITE": "⚪"}
@@ -57,7 +74,9 @@ class Daily(commands.Cog, name="Daily"):
             embed.set_author(name=guild.name, icon_url=guild.icon)
             today = date.today()
             embed.add_field(
-                name="Date", value=f"{str(today)} - Week {(today.isocalendar()[1] - 1) % 5 + 1}", inline=False
+                name="Date",
+                value=f"{str(today)} - Week {(today.isocalendar()[1] - 1) % 5 + 1}",
+                inline=False,
             )
             today_color, tomorrow_color = self.get_tempo_colors()
             embed.add_field(
@@ -75,6 +94,8 @@ class Daily(commands.Cog, name="Daily"):
             message = await chan.send(embed=embed)
             config.dailyMessage = message.id
             db.session.commit()
+            if tomorrow_color == "🔴":
+                await self.send_tempo_notif(guild)
 
     @daily.before_loop
     async def before_reminder(self):
