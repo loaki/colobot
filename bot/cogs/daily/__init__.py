@@ -95,7 +95,7 @@ class Daily(commands.Cog, name="Daily"):
             config.dailyMessage = message.id
             db.session.commit()
             if tomorrow_color == "🔴":
-                await self.send_tempo_notif(guild)
+                await self.send_tempo_notif(config)
 
     @daily.before_loop
     async def before_reminder(self):
