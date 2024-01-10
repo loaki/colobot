@@ -22,8 +22,7 @@ class Daily(commands.Cog, name="Daily"):
     def cog_unload(self):
         self.daily.cancel()
 
-    async def send_tempo_notif(self, config):
-        guild = self.bot.get_guild(config._guildId)
+    async def send_tempo_notif(self, guild, config):
         chan = get(guild.text_channels, id=config.notifChan)
         if not chan:
             return
@@ -62,11 +61,12 @@ class Daily(commands.Cog, name="Daily"):
 
     @tasks.loop(time=[time(hour=9)])
     async def daily(self):
-        print(datetime.now())
         db = get_local_db()
         configs = db.session.query(Config).all()
         for config in configs:
             guild = self.bot.get_guild(config._guildId)
+            if not guild:
+                continue
             chan = get(guild.text_channels, id=config.dailyChan)
             if not chan:
                 continue
@@ -95,7 +95,7 @@ class Daily(commands.Cog, name="Daily"):
             config.dailyMessage = message.id
             db.session.commit()
             if tomorrow_color == "🔴":
-                await self.send_tempo_notif(config)
+                await self.send_tempo_notif(guild, config)
 
     @daily.before_loop
     async def before_reminder(self):
