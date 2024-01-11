@@ -28,6 +28,8 @@ class Reminder(commands.Cog, name="Reminder"):
         configs = db.session.query(Config).all()
         for config in configs:
             guild = self.bot.get_guild(config._guildId)
+            if not guild:
+                continue
             reminders = (
                 db.session.query(ReminderDb).filter(ReminderDb._guildId == config._guildId).all()
             )
