@@ -1,4 +1,5 @@
 import os
+import logging
 
 from . import config
 import nextcord
@@ -33,6 +34,13 @@ def main():
         activity=activity,
         help_command=help_commands.PaginatedHelpCommand(),
     )
+
+    # logger
+    logger = logging.getLogger('nextcord')
+    logger.setLevel(logging.ERROR)
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
 
     # Init database
     get_local_db().create_all()

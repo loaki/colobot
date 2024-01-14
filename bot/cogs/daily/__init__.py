@@ -84,16 +84,17 @@ class Daily(commands.Cog, name="Daily"):
                 value=f"Today : {today_color}\nTomorrow : {tomorrow_color}",
                 inline=False,
             )
+            message = None
             if config.dailyMessage:
                 try:
                     message = await chan.fetch_message(config.dailyMessage)
                     await message.edit(embed=embed)
-                    return
                 except:
                     pass
-            message = await chan.send(embed=embed)
-            config.dailyMessage = message.id
-            db.session.commit()
+            if not message:
+                message = await chan.send(embed=embed)
+                config.dailyMessage = message.id
+                db.session.commit()
             if tomorrow_color == "🔴":
                 await self.send_tempo_notif(guild, config)
 
