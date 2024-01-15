@@ -25,10 +25,10 @@ class Config(commands.Cog, name="Config"):
             db.session.query(ConfigDb).filter(ConfigDb._guildId == interaction.guild.id).first()
         )
         if config is None:
-            await interaction.response.send_message(
-                embed=embed_error(title="", description="❌ Config not found")
-            )
-            return
+            config = ConfigDb()
+            config._guildId = interaction.guild.id
+            db.session.add(config)
+            db.session.commit()
         embed = build_embed(title="⚙️ Config", colour=nextcord.Colour.blurple())
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
         for i in ConfigDb.__dict__.keys():
@@ -90,6 +90,54 @@ class Config(commands.Cog, name="Config"):
                 db.session.commit()
                 await interaction.response.send_message(
                     embed=embed_success(title="", description=f"✅ {option} set to {set_opt}")
+                )
+                return
+            db.session.commit()
+            return
+        await interaction.response.send_message(
+            embed=embed_error(title="", description="❌ Invalid arguments")
+        )
+
+    @nextcord.slash_command(name="unset_config")
+    async def unset_config(
+        self,
+        interaction: nextcord.Interaction,
+        option: str = nextcord.SlashOption(
+            choices=[
+                i for i in ConfigDb.__dict__.keys() if i[0] != "_" and ("Role" in i or "Chan" in i)
+            ]
+        ),
+    ):
+        """A command which setup config.
+        Usage:
+        ```
+        /unset_config option
+        ```
+        """
+        # check permissions
+        if not any(
+            [
+                interaction.user.top_role.permissions.administrator,
+                check_adminrole(interaction.guild, interaction.user),
+            ]
+        ):
+            await interaction.response.send_message(
+                embed=embed_error(title="", description="❌ Non, pas envie")
+            )
+        if option:
+            db = get_local_db()
+            config = (
+                db.session.query(ConfigDb).filter(ConfigDb._guildId == interaction.guild.id).first()
+            )
+            if config is None:
+                config = ConfigDb()
+                config._guildId = interaction.guild.id
+                db.session.add(config)
+            if hasattr(config, option):
+                setattr(config, option, None)
+                db.session.commit()
+                await interaction.response.send_message(
+                    embed=embed_success(title="", description=f"✅ {option} unset")
                 )
                 return
             db.session.commit()

@@ -36,10 +36,10 @@ def main():
     )
 
     # logger
-    logger = logging.getLogger('nextcord')
+    logger = logging.getLogger("nextcord")
     logger.setLevel(logging.ERROR)
     handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
     logger.addHandler(handler)
 
     # Init database

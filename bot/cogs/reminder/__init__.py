@@ -131,7 +131,7 @@ class Reminder(commands.Cog, name="Reminder"):
         """A command which save reminder.
         Usage:
         ```
-        /reminder date message
+        /add_reminder name [...]
         ```
         """
         # check permissions
@@ -158,7 +158,7 @@ class Reminder(commands.Cog, name="Reminder"):
         if start_week_day:
             if startDate.weekday() <= start_week_day:
                 offset = start_week_day - startDate.weekday()
-            else :
+            else:
                 offset = 7 - (startDate.weekday() - start_week_day)
             startDate += relativedelta.relativedelta(days=offset)
         db = get_local_db()
@@ -196,7 +196,7 @@ class Reminder(commands.Cog, name="Reminder"):
         """A command which remove reminder.
         Usage:
         ```
-        /reminder name
+        /rm_reminder name
         ```
         """
         # check permissions
