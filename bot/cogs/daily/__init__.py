@@ -2,6 +2,7 @@ import json
 import requests
 import nextcord
 import asyncio
+import pytz
 
 from nextcord.utils import get
 from dateutil import relativedelta
@@ -45,11 +46,14 @@ class Daily(commands.Cog, name="Daily"):
         if response.status_code == requests.codes.ok:
             r_json = json.loads(response.text)
             headers = {"Authorization": f"Bearer {r_json.get('access_token')}"}
-            today = date.today()
+            tz = pytz.timezone("Europe/Paris")
+            today = datetime.now(tz)
+            offset = today.utcoffset()
+            offset_hours = str(int(offset.seconds / 3600)).zfill(2)
             tomorrow = today + relativedelta.relativedelta(days=2)
             data = {
-                "start_date": today.strftime("%Y-%m-%dT00:00:00+01:00"),
-                "end_date": tomorrow.strftime("%Y-%m-%dT00:00:00+01:00"),
+                "start_date": today.strftime(f"%Y-%m-%dT00:00:00+{offset_hours}:00"),
+                "end_date": tomorrow.strftime(f"%Y-%m-%dT00:00:00+{offset_hours}:00"),
             }
             response = requests.get(tempo_url, headers=headers, params=data)
             if response.status_code == requests.codes.ok:

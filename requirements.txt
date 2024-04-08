@@ -5,3 +5,4 @@ nextcord-ext-menus
 sqlalchemy
 python-dateutil
 requests
+pytz
