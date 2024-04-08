@@ -79,7 +79,7 @@ class Daily(commands.Cog, name="Daily"):
             today = date.today()
             embed.add_field(
                 name="Date",
-                value=f"{str(today)} - Week {(today.isocalendar()[1] - 1) % 5 + 1}",
+                value=str(today),
                 inline=False,
             )
             today_color, tomorrow_color = self.get_tempo_colors()
