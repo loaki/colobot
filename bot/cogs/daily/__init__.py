@@ -38,30 +38,16 @@ class Daily(commands.Cog, name="Daily"):
         await chan.send(embed=embed)
 
     def get_tempo_colors(self):
-        colors = {"RED": "🔴", "BLUE": "🔵", "WHITE": "⚪"}
-        auth_url = "https://digital.iservices.rte-france.com/token/oauth"
-        tempo_url = "https://digital.iservices.rte-france.com/open_api/tempo_like_supply_contract/v1/tempo_like_calendars"
-        headers = {"Authorization": f"Basic {config.RTE_TOKEN}"}
-        response = requests.get(auth_url, headers=headers)
+        today_color = None
+        tomorrow_color = None
+        colors = {1:"🔵", 2:"⚪", 3:"🔴"}
+        response = requests.get("https://www.api-couleur-tempo.fr/api/jourTempo/today")
         if response.status_code == requests.codes.ok:
-            r_json = json.loads(response.text)
-            headers = {"Authorization": f"Bearer {r_json.get('access_token')}"}
-            tz = pytz.timezone("Europe/Paris")
-            today = datetime.now(tz)
-            offset = today.utcoffset()
-            offset_hours = str(int(offset.seconds / 3600)).zfill(2)
-            tomorrow = today + relativedelta.relativedelta(days=2)
-            data = {
-                "start_date": today.strftime(f"%Y-%m-%dT00:00:00+{offset_hours}:00"),
-                "end_date": tomorrow.strftime(f"%Y-%m-%dT00:00:00+{offset_hours}:00"),
-            }
-            response = requests.get(tempo_url, headers=headers, params=data)
-            if response.status_code == requests.codes.ok:
-                r_json = json.loads(response.text)
-                today_color = r_json["tempo_like_calendars"]["values"][1]["value"]
-                tomorrow_color = r_json["tempo_like_calendars"]["values"][0]["value"]
-                return colors[today_color], colors[tomorrow_color]
-        return None, None
+            today_color = response.json().get("codeJour")
+        response = requests.get("https://www.api-couleur-tempo.fr/api/jourTempo/tomorrow")
+        if response.status_code == requests.codes.ok:
+            tomorrow_color = response.json().get("codeJour")
+        return colors.get(today_color), colors.get(tomorrow_color)
 
     @tasks.loop(time=[time(hour=9)])
     async def daily(self):
@@ -70,9 +56,11 @@ class Daily(commands.Cog, name="Daily"):
         for config in configs:
             guild = self.bot.get_guild(config._guildId)
             if not guild:
+                print("no guild found : ", config._guildId)
                 continue
             chan = get(guild.text_channels, id=config.dailyChan)
             if not chan:
+                print("no chan found : ", config.dailyChan)
                 continue
             embed = build_embed(title=f"🗞️ Daily", colour=nextcord.Colour.orange())
             embed.set_author(name=guild.name, icon_url=guild.icon)
