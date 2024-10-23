@@ -1,12 +1,13 @@
 import os
 import logging
+import threading
 
 from . import config
 import nextcord
 from nextcord.ext import commands
 from nextcord.ext import help_commands
-from .utils.embedder import embed_error
 from .db.models import get_local_db, Config
+from .app import run_flask, app
 
 
 def main():
@@ -39,7 +40,9 @@ def main():
     logger = logging.getLogger("nextcord")
     logger.setLevel(logging.ERROR)
     handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+    )
     logger.addHandler(handler)
 
     # Init database
@@ -65,6 +68,12 @@ def main():
             config._guildId = guild.id
             db.session.add(config)
             db.session.commit()
+
+    # Set up Flask app
+    flask_app = app
+    flask_app.config["bot"] = bot
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.start()
 
     # Run Discord bot
     bot.run(config.DISCORD_TOKEN)
