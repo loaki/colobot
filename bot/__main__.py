@@ -7,7 +7,7 @@ import nextcord
 from nextcord.ext import commands
 from nextcord.ext import help_commands
 from .db.models import get_local_db, Config
-from .app import run_flask, app
+from .app import run_fastapi, app
 
 
 def main():
@@ -69,11 +69,11 @@ def main():
             db.session.add(config)
             db.session.commit()
 
-    # Set up Flask app
-    flask_app = app
-    flask_app.config["bot"] = bot
-    flask_thread = threading.Thread(target=run_flask)
-    flask_thread.start()
+    # Set up FastAPI app
+    fastapi_app = app
+    fastapi_app.state.bot = bot
+    fastapi_thread = threading.Thread(target=run_fastapi)
+    fastapi_thread.start()
 
     # Run Discord bot
     bot.run(config.DISCORD_TOKEN)

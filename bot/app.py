@@ -1,73 +1,61 @@
-from flask import Flask, request, jsonify
-from flask_swagger_ui import get_swaggerui_blueprint
 import asyncio
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+from fastapi.responses import JSONResponse
 from nextcord.utils import get
+import uvicorn
+from typing import Optional
+
+app = FastAPI()
 
 
-app = Flask(__name__)
-
-SWAGGER_URL = "/swagger"
-API_URL = "/static/swagger.json"
-swaggerui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL, API_URL, config={"app_name": "Message Sending API"}
-)
-app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+class MessageRequest(BaseModel):
+    guild_id: Optional[int] = Field(None, description="The ID of the guild")
+    channel_id: Optional[int] = Field(None, description="The ID of the channel")
+    member_id: Optional[int] = Field(None, description="The ID of the member")
+    message: str = Field(..., description="The message to send")
 
 
-@app.route("/send_message", methods=["POST"])
-def send_message():
-    data = request.json
-    guild_id = data.get("guild_id")
-    channel_id = data.get("channel_id")
-    member_id = data.get("member_id")
-    message = data.get("message")
-
-    if not all([all([guild_id, channel_id]) or member_id, message]):
-        return (
-            jsonify(
-                {"error": "guild_id, channel_id, member_id or message not provided"}
-            ),
-            400,
-        )
+@app.post("/send_message")
+async def send_message(request: MessageRequest):
+    guild_id = request.guild_id
+    channel_id = request.channel_id
+    member_id = request.member_id
+    message = request.message
 
     try:
-        bot = app.config["bot"]
+        bot = app.state.bot
         target = None
+
         if guild_id and channel_id:
-            guild = bot.get_guild(int(guild_id))
-            if guild:
-                channel = get(guild.text_channels, id=int(channel_id))
-                if channel:
-                    target = channel
+            guild = bot.get_guild(guild_id)
+            if not guild:
+                raise HTTPException(status_code=404, detail="Guild not found")
+            channel = get(guild.text_channels, id=channel_id)
+            if not channel:
+                raise HTTPException(status_code=404, detail="Channel not found")
+            target = channel
         elif member_id:
-            member = bot.get_user(int(member_id))
-            if member:
-                target = member
-        if target:
-
-            async def send_message_async():
-                try:
-                    await target.send(message)
-                    return {"status": "Message sent successfully"}
-                except Exception as e:
-                    return {"error": str(e)}
-
-            loop = bot.loop
-            response_future = asyncio.run_coroutine_threadsafe(
-                send_message_async(), loop
-            )
-
-            response = response_future.result()
-            return jsonify(response), 200 if "status" in response else 500
+            member = bot.get_user(member_id)
+            if not member:
+                raise HTTPException(status_code=404, detail="Member not found")
+            target = member
         else:
-            return jsonify({"error": "Invalid data ID"}), 404
+            raise HTTPException(status_code=400, detail="Invalid request data")
+
+        future = asyncio.run_coroutine_threadsafe(target.send(message), bot.loop)
+        response = future.result()
+        return JSONResponse(content={"status": "success", "message": response.content})
+
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-def run_flask():
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+def run_fastapi():
+    uvicorn.run(app, host="0.0.0.0", port=5000, log_level="info")
 
 
 if __name__ == "__main__":
-    run_flask()
+    run_fastapi()
